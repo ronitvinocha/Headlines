@@ -5,9 +5,11 @@ import com.byjus.headlines.di.pojo.News
 public interface MainContract {
 
     interface ViewCallBack {
-        fun showProgress(news: News)
+        fun showProgress()
 
         fun hideProgress()
+
+        fun showComplete(news: News)
 
     }
 

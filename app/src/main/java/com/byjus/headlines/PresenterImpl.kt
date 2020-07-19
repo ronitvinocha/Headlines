@@ -5,6 +5,7 @@ import com.byjus.headlines.di.retrofit.GetTopNewsInterFace
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import rx.Observer
 import rx.Scheduler
 import rx.android.schedulers.AndroidSchedulers
 import rx.schedulers.Schedulers
@@ -14,18 +15,25 @@ class PresenterImpl @Inject constructor(val getTopNewsInterFace: GetTopNewsInter
 
     override fun loadData() {
         println("hello")
-     val call= getTopNewsInterFace.getnews("US","business","7851dde50bc345b4979c5b6dcec07f7e")
-            call.enqueue(object:Callback<News>{
-                override fun onFailure(call: Call<News>, t: Throwable) {
-                    println(t.message)
-                }
+        mView.showProgress()
+        getTopNewsInterFace.getnews("US","business","7851dde50bc345b4979c5b6dcec07f7e")
+         .subscribeOn(Schedulers.io())
+         .observeOn(AndroidSchedulers.mainThread())
+         .subscribe(object : Observer<News?> {
+                    override fun onCompleted() {
+                        mView.hideProgress()
+                    }
 
-                override fun onResponse(call: Call<News>, response: Response<News>) {
-                    println(response.body())
-                    response.body()?.let { mView.showProgress(it) }
-                }
+                    override fun onError(e: Throwable) {
+                        mView.hideProgress()
+                    }
 
-            })
+                    override fun onNext(data: News?) {
+                        if (data != null) {
+                            mView.showComplete(data)
+                        }
+                    }
+                })
 
     }
 

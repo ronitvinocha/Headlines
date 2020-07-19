@@ -9,5 +9,5 @@ import java.util.*
 
 interface GetTopNewsInterFace {
  @GET("top-headlines")
-  fun getnews(@Query("country") country:String,@Query("category") category:String,@Query("apiKey") apikey:String): Call <News>
+  fun getnews(@Query("country") country:String,@Query("category") category:String,@Query("apiKey") apikey:String): Observable <News>
 }

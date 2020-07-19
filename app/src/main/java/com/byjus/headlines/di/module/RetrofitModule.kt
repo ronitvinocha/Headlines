@@ -10,7 +10,7 @@ import retrofit2.Retrofit
 import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory
 import retrofit2.converter.gson.GsonConverterFactory
 
-@Module
+@Module(includes = [okhttpclientmodule::class])
 class RetrofitModule {
 
     @Provides
@@ -30,9 +30,5 @@ class RetrofitModule {
             .build()
     }
 
-    @Provides
-    @ApplicationScope
-    fun getokhttpclient():OkHttpClient{
-        return OkHttpClient.Builder().build()
-    }
+
 }

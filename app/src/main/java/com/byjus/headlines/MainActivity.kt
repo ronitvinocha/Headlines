@@ -1,16 +1,15 @@
 package com.byjus.headlines
 
-import android.content.Context
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import com.byjus.headlines.di.component.ApplicationComponent
+import android.view.View
+import android.view.Window
+import android.view.WindowManager
 import com.byjus.headlines.di.component.DaggerMainActivityComponent
 import com.byjus.headlines.di.component.MainActivityComponent
 import com.byjus.headlines.di.module.ActivityContextModule
 import com.byjus.headlines.di.module.MvpModule
 import com.byjus.headlines.di.pojo.News
-import com.byjus.headlines.di.qualifiers.ActivityContext
-import com.byjus.headlines.di.qualifiers.ApplicationContext
 import kotlinx.android.synthetic.main.activity_main.*
 import javax.inject.Inject
 
@@ -25,6 +24,8 @@ class MainActivity : AppCompatActivity(),MainContract.ViewCallBack,RecyclerViewA
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+         var w = getWindow(); // in Activity's onCreate() for instance
+        w.setFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS, WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
         setSupportActionBar(my_toolbar)
         val applicationComponent=MyApplication.get(this).getapplicationComponent()
         mainActivityComponent= DaggerMainActivityComponent.builder()
@@ -37,18 +38,35 @@ class MainActivity : AppCompatActivity(),MainContract.ViewCallBack,RecyclerViewA
         println(context)
         var mContext=applicationComponent.getContext()
         println(mContext)
+        println("😄"+recyclerViewAdapter)
+        recyclerview.adapter=recyclerViewAdapter
+//          recyclerview.adapter=recyclerViewAdapter
     }
 
-    override fun showProgress(news: News) {
 
+    override fun showProgress() {
+        progressbar.visibility= View.VISIBLE
+        recyclerview.visibility=View.GONE
     }
 
 
     override fun hideProgress() {
-        TODO("Not yet implemented")
+        progressbar.visibility= View.GONE
+        recyclerview.visibility=View.VISIBLE
+    }
+
+    override fun showComplete(news: News) {
+       println(news.articles.size)
+        news.articles.map {
+           it-> println(it.urlToImage)
+        }
+      recyclerViewAdapter.setData(news.articles)
+        println("hello"+recyclerViewAdapter)
+
     }
 
     override fun launchIntent(name: String) {
         TODO("Not yet implemented")
     }
+
 }
