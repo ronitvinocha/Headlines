@@ -7,7 +7,7 @@ import com.byjus.headlines.di.scopes.ActivityScope
 import dagger.Component
 
 @ActivityScope
-@Component(modules = [PiccassoModule::class],dependencies = [ApplicationComponent::class])
+@Component(dependencies = [ApplicationComponent::class])
 interface DetailsComponent {
     fun inject(target: DescriptionActivity)
 }

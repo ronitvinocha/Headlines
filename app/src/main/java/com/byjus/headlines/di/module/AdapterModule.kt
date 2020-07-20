@@ -10,12 +10,12 @@ import com.squareup.picasso.Picasso
 import dagger.Module
 import dagger.Provides
 
-@Module(includes = [ActivityContextModule::class,PiccassoModule::class])
+@Module(includes = [ActivityContextModule::class])
 class AdapterModule {
     @Provides
     @ActivityScope
-    fun getNewsList(clickListener: RecyclerViewAdapter.ClickListener,picasso: Picasso):RecyclerViewAdapter{
-        return RecyclerViewAdapter(clickListener,picasso)
+    fun getNewsList(clickListener: RecyclerViewAdapter.ClickListener):RecyclerViewAdapter{
+        return RecyclerViewAdapter(clickListener)
     }
 
     @Provides

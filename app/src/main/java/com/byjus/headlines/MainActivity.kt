@@ -1,7 +1,10 @@
 package com.byjus.headlines
 
 import android.app.ActivityOptions
+import android.content.Context
 import android.content.Intent
+import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
@@ -11,10 +14,13 @@ import android.widget.ImageView
 import android.widget.TextView
 import com.byjus.headlines.di.component.DaggerMainActivityComponent
 import com.byjus.headlines.di.component.MainActivityComponent
+import com.byjus.headlines.di.database.Article
+import com.byjus.headlines.di.database.LocalDatabase
 import com.byjus.headlines.di.module.ActivityContextModule
 import com.byjus.headlines.di.module.MvpModule
 import com.byjus.headlines.di.pojo.Articles
 import com.byjus.headlines.di.pojo.News
+import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.activity_main.*
 import javax.inject.Inject
 
@@ -24,7 +30,8 @@ class MainActivity : AppCompatActivity(),MainContract.ViewCallBack,RecyclerViewA
     lateinit var presenterImpl: PresenterImpl
      @Inject
     lateinit var  recyclerViewAdapter:RecyclerViewAdapter
-
+    lateinit var picasso: Picasso
+    lateinit var db:LocalDatabase
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -38,16 +45,27 @@ class MainActivity : AppCompatActivity(),MainContract.ViewCallBack,RecyclerViewA
             .activityContextModule(ActivityContextModule(this)).
             mvpModule(MvpModule(this)).build()
         mainActivityComponent.inject(this)
-        presenterImpl.loadData()
-        var context=mainActivityComponent.getContext()
-        println(context)
-        var mContext=applicationComponent.getContext()
-        println(mContext)
-        println("😄"+recyclerViewAdapter)
+        picasso=applicationComponent.getPiccaso()
+        println(picasso)
+        db=applicationComponent.getDatabase()
+        recyclerViewAdapter.setPiccaso(picasso)
         recyclerview.adapter=recyclerViewAdapter
-//          recyclerview.adapter=recyclerViewAdapter
+        if(isNetworkConnected())
+        {
+            presenterImpl.loadData(db)
+        }
+        else
+        {
+            presenterImpl.getAllrecord(db)
+        }
     }
-
+    private fun isNetworkConnected(): Boolean {
+      val connectivityManager = getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+      val activeNetwork = connectivityManager.activeNetwork
+      val networkCapabilities = connectivityManager.getNetworkCapabilities(activeNetwork)
+      return networkCapabilities != null &&
+          networkCapabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
+    }
 
     override fun showProgress() {
         progressbar.visibility= View.VISIBLE
@@ -60,23 +78,19 @@ class MainActivity : AppCompatActivity(),MainContract.ViewCallBack,RecyclerViewA
         recyclerview.visibility=View.VISIBLE
     }
 
-    override fun showComplete(news: News) {
-       println(news.articles.size)
-        news.articles.map {
-           it-> println(it.urlToImage)
-        }
-      recyclerViewAdapter.setData(news.articles)
+    override fun showComplete(articles:List<Article>) {
+      recyclerViewAdapter.setData(articles)
         println("hello"+recyclerViewAdapter)
 
     }
 
-    override fun launchIntent(article: Articles) {
+    override fun launchIntent(article: Article) {
       val intent = Intent(this,DescriptionActivity::class.java)
-        intent.putExtra("urltoimage",article.urlToImage)
+        intent.putExtra("urltoimage",article.urltoimage)
         intent.putExtra("description",article.description)
         intent.putExtra("title",article.title)
-        intent.putExtra("source",article.source?.name)
-        intent.putExtra("date",article.publishedAt?.substring(0,10))
+        intent.putExtra("source",article.source)
+        intent.putExtra("date",article.date)
         startActivity(intent)
     }
 

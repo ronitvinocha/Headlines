@@ -1,5 +1,7 @@
 package com.byjus.headlines
 
+import com.byjus.headlines.di.database.Article
+import com.byjus.headlines.di.database.LocalDatabase
 import com.byjus.headlines.di.pojo.News
 
 public interface MainContract {
@@ -9,7 +11,9 @@ public interface MainContract {
 
         fun hideProgress()
 
-        fun showComplete(news: News)
+        fun showComplete(articles: List<Article>)
+
+
 
     }
 
@@ -22,6 +26,7 @@ public interface MainContract {
     }
 
     interface PresenterCallBack {
-        fun loadData()
+        fun loadData(localDatabase: LocalDatabase)
+        fun getAllrecord(db:LocalDatabase)
     }
 }

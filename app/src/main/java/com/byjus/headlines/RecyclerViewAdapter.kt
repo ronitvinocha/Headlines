@@ -7,15 +7,19 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.RecyclerView
+import com.byjus.headlines.di.database.Article
 import com.byjus.headlines.di.pojo.Articles
+import com.squareup.picasso.Callback
+import com.squareup.picasso.NetworkPolicy
 import com.squareup.picasso.Picasso
 import javax.inject.Inject
 
-class RecyclerViewAdapter @Inject constructor( var clickListener: ClickListener,var  picasso: Picasso) : RecyclerView.Adapter<RecyclerViewAdapter.ViewHolder>() {
+class RecyclerViewAdapter @Inject constructor( var clickListener: ClickListener) : RecyclerView.Adapter<RecyclerViewAdapter.ViewHolder>() {
 
-    lateinit var articles:Array<Articles>
+    lateinit var articles:List<Article>
+    lateinit var picasso:Picasso
     init {
-        articles= arrayOf(Articles())
+        articles= listOf()
     }
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         return ViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.recycleitem, parent, false))
@@ -26,12 +30,23 @@ class RecyclerViewAdapter @Inject constructor( var clickListener: ClickListener,
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        holder.source.text=articles[position].source?.name
-        holder.date.text=articles[position].publishedAt?.substring(0,10)
-        holder.title.text=articles[position].title
-        if(articles[position].urlToImage!=null)
-        picasso.load(articles[position].urlToImage).fit().centerCrop().into(holder.imageView)
-        holder.itemLayout.setOnClickListener { clickListener.launchIntent(articles[position]) }
+        holder.source.text=articles.get(position).source
+        holder.date.text=articles.get(position).date
+        holder.title.text=articles.get(position).title
+        if(articles.get(position).urltoimage!=null){
+            picasso.load(articles.get(position).urltoimage).fit().centerCrop().networkPolicy(
+            NetworkPolicy.OFFLINE).into(holder.imageView,object: Callback {
+                    override fun onSuccess() {
+
+                    }
+
+                    override fun onError(e: java.lang.Exception?) {
+                         println(e?.message)
+                         picasso.load(articles.get(position).urltoimage).fit().centerCrop().into(holder.imageView)
+                    }
+                })
+        }
+        holder.itemLayout.setOnClickListener { clickListener.launchIntent(articles.get(position)) }
     }
 
      class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
@@ -49,11 +64,15 @@ class RecyclerViewAdapter @Inject constructor( var clickListener: ClickListener,
          }
     }
      interface ClickListener {
-        fun launchIntent(articles: Articles)
+        fun launchIntent(articles: Article)
     }
-    fun setData(data: Array<Articles>) {
+    fun setData(data: List<Article>) {
         this.articles=data
         notifyDataSetChanged()
+    }
+    fun setPiccaso(picasso: Picasso)
+    {
+        this.picasso=picasso
     }
 }
 
