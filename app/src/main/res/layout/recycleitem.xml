@@ -36,6 +36,7 @@
         app:layout_constraintBottom_toTopOf="@id/sourcelayout"
         android:layout_marginBottom="20dp"
         android:textAlignment="textStart"
+        android:transitionName="sharedtext"
         android:textColor="@color/textcolorwhite2"
         android:textSize="20sp"
         android:layout_marginStart="16dp"

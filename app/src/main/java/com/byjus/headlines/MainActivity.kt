@@ -1,14 +1,19 @@
 package com.byjus.headlines
 
+import android.app.ActivityOptions
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
 import android.view.Window
 import android.view.WindowManager
+import android.widget.ImageView
+import android.widget.TextView
 import com.byjus.headlines.di.component.DaggerMainActivityComponent
 import com.byjus.headlines.di.component.MainActivityComponent
 import com.byjus.headlines.di.module.ActivityContextModule
 import com.byjus.headlines.di.module.MvpModule
+import com.byjus.headlines.di.pojo.Articles
 import com.byjus.headlines.di.pojo.News
 import kotlinx.android.synthetic.main.activity_main.*
 import javax.inject.Inject
@@ -65,8 +70,14 @@ class MainActivity : AppCompatActivity(),MainContract.ViewCallBack,RecyclerViewA
 
     }
 
-    override fun launchIntent(name: String) {
-        TODO("Not yet implemented")
+    override fun launchIntent(article: Articles) {
+      val intent = Intent(this,DescriptionActivity::class.java)
+        intent.putExtra("urltoimage",article.urlToImage)
+        intent.putExtra("description",article.description)
+        intent.putExtra("title",article.title)
+        intent.putExtra("source",article.source?.name)
+        intent.putExtra("date",article.publishedAt?.substring(0,10))
+        startActivity(intent)
     }
 
 }

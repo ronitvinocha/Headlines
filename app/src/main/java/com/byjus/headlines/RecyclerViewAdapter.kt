@@ -31,7 +31,7 @@ class RecyclerViewAdapter @Inject constructor( var clickListener: ClickListener,
         holder.title.text=articles[position].title
         if(articles[position].urlToImage!=null)
         picasso.load(articles[position].urlToImage).fit().centerCrop().into(holder.imageView)
-
+        holder.itemLayout.setOnClickListener { clickListener.launchIntent(articles[position]) }
     }
 
      class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
@@ -49,7 +49,7 @@ class RecyclerViewAdapter @Inject constructor( var clickListener: ClickListener,
          }
     }
      interface ClickListener {
-        fun launchIntent(name:String);
+        fun launchIntent(articles: Articles)
     }
     fun setData(data: Array<Articles>) {
         this.articles=data
